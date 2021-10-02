@@ -17,20 +17,13 @@ limitations under the License.
 package cmd
 
 import (
-	"fmt"
-
 	log "github.com/sirupsen/logrus"
 	"github.com/spf13/cobra"
 )
 
-type globalFlags struct {
+type flags struct {
 	verbose int
 }
-
-var (
-	Version  string
-	Revision string
-)
 
 var RootCmd = &cobra.Command{
 	Use:           "kustomize-diff",
@@ -40,7 +33,7 @@ var RootCmd = &cobra.Command{
 		if cmd.Use == "version" {
 			return nil
 		}
-		switch globalOpts.verbose {
+		switch opts.verbose {
 		case 0:
 			log.SetLevel(log.ErrorLevel)
 		case 1:
@@ -56,19 +49,11 @@ var RootCmd = &cobra.Command{
 	},
 }
 
-var globalOpts globalFlags
+var opts flags
 
 func init() {
 	cobra.OnInitialize()
-	RootCmd.PersistentFlags().CountVarP(&globalOpts.verbose, "verbose", "v", "verbose mode. (1: info, 2: debug, 3: trace)")
+	RootCmd.PersistentFlags().CountVarP(&opts.verbose, "verbose", "v", "verbose mode. (1: info, 2: debug, 3: trace)")
 	RootCmd.AddCommand(versionCmd)
-}
-
-var versionCmd = &cobra.Command{
-	Use:   "version",
-	Short: "Print the version number of kustomize-diff",
-	Long:  `Print the version number of kustomize-diff`,
-	Run: func(cmd *cobra.Command, args []string) {
-		fmt.Printf("kustomize-diff %s (revision: %s)", Version, Revision)
-	},
+	RootCmd.AddCommand(runCmd)
 }
