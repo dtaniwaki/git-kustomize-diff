@@ -18,6 +18,7 @@ package utils
 
 import (
 	"io/ioutil"
+	"os"
 	"os/exec"
 	"strings"
 )
@@ -27,7 +28,10 @@ func Diff(text1, text2 string) (string, error) {
 	if err != nil {
 		return "", err
 	}
-	defer tmpFile1.Close()
+	defer (func() {
+		tmpFile1.Close()
+		os.Remove(tmpFile1.Name())
+	})()
 	_, err = tmpFile1.Write([]byte(text1))
 	if err != nil {
 		return "", err
@@ -37,7 +41,10 @@ func Diff(text1, text2 string) (string, error) {
 	if err != nil {
 		return "", err
 	}
-	defer tmpFile2.Close()
+	defer (func() {
+		tmpFile2.Close()
+		os.Remove(tmpFile2.Name())
+	})()
 	_, err = tmpFile2.Write([]byte(text2))
 	if err != nil {
 		return "", err
