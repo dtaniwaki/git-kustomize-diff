@@ -17,7 +17,7 @@ Check diff of your kustomize directory.
 $ go install -u github.com/dtaniwaki/git-kustomize-diff
 ```
 
-Or, download the binary from [GitHub Releases](/git-kustomize-diff/releases) and put it in your `$PATH`.
+Or, download the binary from [GitHub Releases](https://github.com/dtaniwaki/git-kustomize-diff/releases) and put it in your `$PATH`.
 
 ## Usage
 
