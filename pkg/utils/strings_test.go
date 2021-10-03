@@ -16,13 +16,31 @@ limitations under the License.
 
 package utils
 
-import "strings"
+import (
+	"strings"
+	"testing"
 
-func GetCommitHash(arg string) (string, error) {
-	wd := &WorkDir{}
-	stdout, _, err := wd.RunCommand("git", "rev-parse", "-q", "--short", arg)
-	if err != nil {
-		return "", err
+	"github.com/stretchr/testify/assert"
+)
+
+func TestDiff(t *testing.T) {
+	expectedDiff := strings.TrimLeft(`
+@@ -1,3 +1,3 @@
+ a
+-b
+ c
++d
+`, "\n")
+
+	diff, err := Diff("a\nb\nc\n", "a\nc\nd\n")
+	if !assert.NoError(t, err) {
+		t.FailNow()
 	}
-	return strings.Trim(stdout, "\n"), nil
+	assert.Equal(t, expectedDiff, diff)
+
+	diff, err = Diff("a\nb\nc\n", "a\nb\nc\n")
+	if !assert.NoError(t, err) {
+		t.FailNow()
+	}
+	assert.Equal(t, "", diff)
 }
