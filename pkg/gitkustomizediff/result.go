@@ -19,7 +19,6 @@ package gitkustomizediff
 import (
 	"fmt"
 	"sort"
-	"strings"
 )
 
 type DiffResult interface {
@@ -36,7 +35,7 @@ func (r *DiffError) ToString() string {
 }
 
 func (r *DiffError) AsMarkdown() string {
-	return fmt.Sprintf("```\n%s```", r.Error())
+	return fmt.Sprintf("```\n%s\n```", r.Error())
 }
 
 func (r *DiffError) Error() error {
@@ -53,13 +52,15 @@ func (r *DiffContent) ToString() string {
 
 func (r *DiffContent) AsMarkdown() string {
 	if r.content == "" {
-		return "```N/A```"
+		return ""
 	} else {
-		return fmt.Sprintf("```diff\n%s```", r.content)
+		return fmt.Sprintf("```diff\n%s\n```", r.content)
 	}
 }
 
 type DiffMap struct {
+	SrcDirs []string
+	DstDirs []string
 	Results map[string]DiffResult
 }
 
@@ -69,7 +70,7 @@ func NewDiffMap() *DiffMap {
 	}
 }
 
-func (dm *DiffMap) AsMarkdown() string {
+func (dm *DiffMap) Dirs() []string {
 	paths := make([]string, 0)
 	for path := range dm.Results {
 		paths = append(paths, path)
@@ -77,9 +78,5 @@ func (dm *DiffMap) AsMarkdown() string {
 	sort.Slice(paths, func(i, j int) bool {
 		return paths[i] < paths[j]
 	})
-	lines := make([]string, len(paths))
-	for idx, path := range paths {
-		lines[idx] = fmt.Sprintf("## %s:\n%s", path, dm.Results[path].AsMarkdown())
-	}
-	return strings.Join(lines, "\n")
+	return paths
 }

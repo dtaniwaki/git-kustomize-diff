@@ -31,8 +31,7 @@ var versionCmd = &cobra.Command{
 	Use:   "version",
 	Short: "Print the version number of git-kustomize-diff",
 	Long:  `Print the version number of git-kustomize-diff`,
-	RunE: func(cmd *cobra.Command, args []string) error {
+	Run: func(cmd *cobra.Command, args []string) {
 		fmt.Printf("git-kustomize-diff %s (revision: %s)", Version, Revision)
-		return nil
 	},
 }

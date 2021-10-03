@@ -20,11 +20,13 @@ import (
 	"path/filepath"
 
 	"github.com/dtaniwaki/git-kustomize-diff/pkg/utils"
+	log "github.com/sirupsen/logrus"
 	"sigs.k8s.io/kustomize/api/krusty"
 	"sigs.k8s.io/kustomize/kyaml/filesys"
 )
 
 func Diff(baseDirPath, targetDirPath string) (*DiffMap, error) {
+	log.Info("Start diff")
 	baseKDirs, err := utils.ListKustomizeDirs(baseDirPath, utils.ListKustomizeDirsOpts{})
 	if err != nil {
 		return nil, err

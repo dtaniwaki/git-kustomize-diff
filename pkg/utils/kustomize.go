@@ -32,6 +32,9 @@ type ListKustomizeDirsOpts struct {
 func ListKustomizeDirs(dirPath string, opts ListKustomizeDirsOpts) ([]string, error) {
 	targetFiles := make([]string, 0)
 	err := filepath.WalkDir(dirPath, func(path string, d fs.DirEntry, err error) error {
+		if err != nil {
+			return err
+		}
 		if !d.IsDir() {
 			return nil
 		}

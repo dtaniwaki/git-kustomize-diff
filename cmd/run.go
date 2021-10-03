@@ -17,14 +17,41 @@ limitations under the License.
 package cmd
 
 import (
+	"fmt"
+
+	"github.com/dtaniwaki/git-kustomize-diff/pkg/gitkustomizediff"
 	"github.com/spf13/cobra"
 )
 
+type runFlags struct {
+	base   string
+	target string
+}
+
 var runCmd = &cobra.Command{
-	Use:   "run",
+	Use:   "run target_dir",
 	Short: "Run git-kustomize-diff",
 	Long:  `Run git-kustomize-diff`,
-	RunE: func(cmd *cobra.Command, args []string) error {
-		return nil
+	Args:  cobra.RangeArgs(0, 1),
+	Run: func(cmd *cobra.Command, args []string) {
+		opts := gitkustomizediff.RunOpts{
+			Base:   runOpts.base,
+			Target: runOpts.target,
+		}
+		dir := "."
+		if len(args) == 1 {
+			dir = args[0]
+		}
+		err := gitkustomizediff.Run(dir, opts)
+		if err != nil {
+			fmt.Println(err.Error())
+		}
 	},
+}
+
+var runOpts runFlags
+
+func init() {
+	runCmd.PersistentFlags().StringVar(&runOpts.base, "base", "", "base commitish (default to origin/main)")
+	runCmd.PersistentFlags().StringVar(&runOpts.target, "target", "", "target commitish (default to the current branch)")
 }

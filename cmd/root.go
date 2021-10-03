@@ -21,7 +21,7 @@ import (
 	"github.com/spf13/cobra"
 )
 
-type flags struct {
+type rootFlags struct {
 	verbose int
 }
 
@@ -29,11 +29,11 @@ var RootCmd = &cobra.Command{
 	Use:           "git-kustomize-diff",
 	Short:         "git-kustomize-diff",
 	SilenceErrors: false,
-	PersistentPreRunE: func(cmd *cobra.Command, args []string) error {
+	PersistentPreRun: func(cmd *cobra.Command, args []string) {
 		if cmd.Use == "version" {
-			return nil
+			return
 		}
-		switch opts.verbose {
+		switch rootOpts.verbose {
 		case 0:
 			log.SetLevel(log.ErrorLevel)
 		case 1:
@@ -45,15 +45,14 @@ var RootCmd = &cobra.Command{
 		default:
 			log.SetLevel(log.TraceLevel)
 		}
-		return nil
 	},
 }
 
-var opts flags
+var rootOpts rootFlags
 
 func init() {
 	cobra.OnInitialize()
-	RootCmd.PersistentFlags().CountVarP(&opts.verbose, "verbose", "v", "verbose mode. (1: info, 2: debug, 3: trace)")
+	RootCmd.PersistentFlags().CountVarP(&rootOpts.verbose, "verbose", "v", "verbose mode. (1: info, 2: debug, 3: trace)")
 	RootCmd.AddCommand(versionCmd)
 	RootCmd.AddCommand(runCmd)
 }
