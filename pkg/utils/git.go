@@ -141,7 +141,10 @@ func (gd *GitDir) Apply(patch string) error {
 		tmpFile.Close()
 		os.Remove(tmpFile.Name())
 	})()
-	tmpFile.Write([]byte(patch))
+	_, err = tmpFile.Write([]byte(patch))
+	if err != nil {
+		return err
+	}
 	_, _, err = gd.WorkDir.RunCommand("git", "apply", tmpFile.Name())
 	if err != nil {
 		return err
