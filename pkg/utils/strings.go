@@ -24,7 +24,7 @@ import (
 )
 
 func Diff(text1, text2 string) (string, error) {
-	tmpFile1, err := ioutil.TempFile("", "kustomize-diff-diff-")
+	tmpFile1, err := ioutil.TempFile("", "git-kustomize-diff-diff-")
 	if err != nil {
 		return "", err
 	}
@@ -37,7 +37,7 @@ func Diff(text1, text2 string) (string, error) {
 		return "", err
 	}
 
-	tmpFile2, err := ioutil.TempFile("", "kustomize-diff-diff-")
+	tmpFile2, err := ioutil.TempFile("", "git-kustomize-diff-diff-")
 	if err != nil {
 		return "", err
 	}

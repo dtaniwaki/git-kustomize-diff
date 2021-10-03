@@ -14,12 +14,12 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-package kustomizediff
+package gitkustomizediff
 
 import (
 	"path/filepath"
 
-	"github.com/dtaniwaki/kustomize-diff/pkg/utils"
+	"github.com/dtaniwaki/git-kustomize-diff/pkg/utils"
 	"sigs.k8s.io/kustomize/api/krusty"
 	"sigs.k8s.io/kustomize/kyaml/filesys"
 )

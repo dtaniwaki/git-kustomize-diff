@@ -29,10 +29,10 @@ var (
 
 var versionCmd = &cobra.Command{
 	Use:   "version",
-	Short: "Print the version number of kustomize-diff",
-	Long:  `Print the version number of kustomize-diff`,
+	Short: "Print the version number of git-kustomize-diff",
+	Long:  `Print the version number of git-kustomize-diff`,
 	RunE: func(cmd *cobra.Command, args []string) error {
-		fmt.Printf("kustomize-diff %s (revision: %s)", Version, Revision)
+		fmt.Printf("git-kustomize-diff %s (revision: %s)", Version, Revision)
 		return nil
 	},
 }

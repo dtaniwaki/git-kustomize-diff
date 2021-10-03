@@ -1,4 +1,4 @@
-module github.com/dtaniwaki/kustomize-diff
+module github.com/dtaniwaki/git-kustomize-diff
 
 go 1.16
 

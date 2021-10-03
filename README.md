@@ -1,4 +1,4 @@
-# kustomize-diff
+# git-kustomize-diff
 
 ## Prerequisites
 
@@ -7,7 +7,7 @@
 ## Installation
 
 ```bash
-$ go get -u github.com/dtaniwaki/kustomize-diff
+$ go get -u github.com/dtaniwaki/git-kustomize-diff
 ```
 
 ## Contributing

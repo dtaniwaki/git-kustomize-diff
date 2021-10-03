@@ -1,10 +1,10 @@
-NAME        := kustomize-diff
+NAME        := git-kustomize-diff
 PROJECTROOT := $(shell pwd)
 VERSION     := $(if $(VERSION),$(VERSION),$(shell cat ${PROJECTROOT}/VERSION)-dev)
 REVISION    := $(shell git rev-parse --short HEAD)
 OUTDIR      ?= $(PROJECTROOT)/dist
 
-LDFLAGS := -ldflags="-s -w -X \"github.com/dtaniwaki/kustomize-diff/cmd.Version=$(VERSION)\" -X \"github.com/dtaniwaki/kustomize-diff/cmd.Revision=$(REVISION)\""
+LDFLAGS := -ldflags="-s -w -X \"github.com/dtaniwaki/git-kustomize-diff/cmd.Version=$(VERSION)\" -X \"github.com/dtaniwaki/git-kustomize-diff/cmd.Revision=$(REVISION)\""
 
 .PHONY: build
 build:
@@ -19,7 +19,7 @@ build-linux-amd64:
 	make build \
 		GOOS=linux \
 		GOARCH=amd64 \
-		NAME=kustomize-diff-linux-amd64
+		NAME=git-kustomize-diff-linux-amd64
 
 .PHONY: build-linux
 build-linux: build-linux-amd64
@@ -28,14 +28,14 @@ build-linux: build-linux-amd64
 build-darwin:
 	make build \
 		GOOS=darwin \
-		NAME=kustomize-diff-darwin-amd64
+		NAME=git-kustomize-diff-darwin-amd64
 
 .PHONY: build-windows
 build-windows:
 	make build \
 		GOARCH=amd64 \
 		GOOS=windows \
-		NAME=kustomize-diff-windows-amd64.exe
+		NAME=git-kustomize-diff-windows-amd64.exe
 
 .PHONY: build-all
 build-all: build-linux build-darwin build-windows

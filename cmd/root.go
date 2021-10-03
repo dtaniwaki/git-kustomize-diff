@@ -26,8 +26,8 @@ type flags struct {
 }
 
 var RootCmd = &cobra.Command{
-	Use:           "kustomize-diff",
-	Short:         "kustomize-diff",
+	Use:           "git-kustomize-diff",
+	Short:         "git-kustomize-diff",
 	SilenceErrors: false,
 	PersistentPreRunE: func(cmd *cobra.Command, args []string) error {
 		if cmd.Use == "version" {

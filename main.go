@@ -19,7 +19,7 @@ package main
 import (
 	"os"
 
-	"github.com/dtaniwaki/kustomize-diff/cmd"
+	"github.com/dtaniwaki/git-kustomize-diff/cmd"
 
 	log "github.com/sirupsen/logrus"
 )

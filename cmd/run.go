@@ -17,22 +17,14 @@ limitations under the License.
 package cmd
 
 import (
-	"fmt"
-
-	"github.com/dtaniwaki/kustomize-diff/pkg/utils"
 	"github.com/spf13/cobra"
 )
 
 var runCmd = &cobra.Command{
 	Use:   "run",
-	Short: "Run kustomize-diff",
-	Long:  `Run kustomize-diff`,
+	Short: "Run git-kustomize-diff",
+	Long:  `Run git-kustomize-diff`,
 	RunE: func(cmd *cobra.Command, args []string) error {
-		stdout, err := utils.GetCommitHash(args[0])
-		if err != nil {
-			return err
-		}
-		fmt.Println(stdout)
 		return nil
 	},
 }
