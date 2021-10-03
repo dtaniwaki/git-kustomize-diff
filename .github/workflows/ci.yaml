@@ -25,10 +25,10 @@ jobs:
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v2
-    - name: build
-      run: make build
     - name: debug
       run: "which go; go version"
+    - name: build
+      run: make build
   lint:
     needs: setup
     runs-on: ubuntu-latest
