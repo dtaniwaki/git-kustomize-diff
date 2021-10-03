@@ -1,36 +1,17 @@
 name: Test
 on: [push]
 jobs:
-  setup:
+  build:
     runs-on: ubuntu-latest
     steps:
     - name: set up
       uses: actions/setup-go@v2
       with:
         go-version: ^1.16
-      id: go
-    - name: check out
-      uses: actions/checkout@v2
-    - name: Cache
-      uses: actions/cache@v2.1.0
-      with:
-        path: ~/go/pkg/mod
-        key: ${{ runner.os }}-go-${{ hashFiles('**/go.sum') }}
-        restore-keys: |
-          ${{ runner.os }}-go-
-    - name: debug
-      run: "which go; go version"
-  build:
-    needs: setup
-    runs-on: ubuntu-latest
-    steps:
     - uses: actions/checkout@v2
-    - name: debug
-      run: "which go; go version"
     - name: build
       run: make build
   lint:
-    needs: setup
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v2
@@ -39,9 +20,12 @@ jobs:
       with:
         version: v1.42.1
   test:
-    needs: setup
     runs-on: ubuntu-latest
     steps:
+    - name: set up
+      uses: actions/setup-go@v2
+      with:
+        go-version: ^1.16
     - uses: actions/checkout@v2
     - name: test
       run: make test
