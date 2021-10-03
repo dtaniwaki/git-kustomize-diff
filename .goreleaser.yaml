@@ -7,6 +7,12 @@ before:
 builds:
 - main: .
   binary: git-kustomize-diff
+  goos:
+  - linux
+  - darwin
+  - windows
+  goarch:
+  - amd64
   ldflags:
   - -s -w
   - -X github.com/dtaniwaki/git-kustomize-diff/cmd.Version={{.Version}}
