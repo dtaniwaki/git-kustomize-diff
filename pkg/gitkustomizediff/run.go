@@ -112,6 +112,11 @@ func Run(dirPath string, opts RunOpts) error {
 
 	dirs := diffMap.Dirs()
 	fmt.Println("# Git Kustomize Diff")
+	fmt.Printf("dir: %s\n", dirPath)
+	fmt.Printf("base: %s\n", opts.Base)
+	fmt.Printf("target: %s\n", opts.Target)
+	fmt.Println("")
+
 	fmt.Printf("## Target Kustomizations\n\n```\n%s\n```\n\n", strings.Join(dirs, "\n"))
 
 	fmt.Printf("## Diff\n")
