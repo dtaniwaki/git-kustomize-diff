@@ -34,6 +34,7 @@ type RunOpts struct {
 	ExcludeRegexp *regexp.Regexp
 	KustomizePath string
 	Debug         bool
+	AllowDirty    bool
 }
 
 func Run(dirPath string, opts RunOpts) error {
@@ -61,6 +62,16 @@ func Run(dirPath string, opts RunOpts) error {
 	targetCommit, err := currentGitDir.CommitHash(targetCommitish)
 	if err != nil {
 		return err
+	}
+
+	dirtyPatch := ""
+	if opts.AllowDirty {
+		log.Infof("Generate a dirty patch from %s", targetCommit)
+		diff, err := currentGitDir.Diff(targetCommit)
+		if err != nil {
+			return err
+		}
+		dirtyPatch = diff
 	}
 
 	log.Infof("Clone the git repo at %s for base", baseCommit)
@@ -96,6 +107,13 @@ func Run(dirPath string, opts RunOpts) error {
 	err = targetGitDir.Merge(targetCommit)
 	if err != nil {
 		return err
+	}
+	if dirtyPatch != "" {
+		log.Infof("Apply the dirty patch")
+		err = targetGitDir.Apply(dirtyPatch)
+		if err != nil {
+			return err
+		}
 	}
 
 	diffMap, err := Diff(baseGitDir.WorkDir.Dir, targetGitDir.WorkDir.Dir, DiffOpts{

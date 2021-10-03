@@ -31,6 +31,7 @@ type runFlags struct {
 	excludeRegexpString string
 	kustomizePath       string
 	debug               bool
+	allowDirty          bool
 }
 
 var runCmd = &cobra.Command{
@@ -43,6 +44,7 @@ var runCmd = &cobra.Command{
 			Base:          runOpts.base,
 			Target:        runOpts.target,
 			Debug:         runOpts.debug,
+			AllowDirty:    runOpts.allowDirty,
 			KustomizePath: runOpts.kustomizePath,
 		}
 		if runOpts.includeRegexpString != "" {
@@ -81,4 +83,5 @@ func init() {
 	runCmd.PersistentFlags().StringVar(&runOpts.excludeRegexpString, "exclude", "", "exclude regexp (default to none)")
 	runCmd.PersistentFlags().StringVar(&runOpts.kustomizePath, "kustomize-path", "", "path of a kustomize binary (default to embeded)")
 	runCmd.PersistentFlags().BoolVar(&runOpts.debug, "debug", false, "debug mode")
+	runCmd.PersistentFlags().BoolVar(&runOpts.allowDirty, "allow-dirty", false, "allow dirty tree")
 }

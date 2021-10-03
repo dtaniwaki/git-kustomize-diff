@@ -18,6 +18,7 @@ package utils
 
 import (
 	"io"
+	"io/ioutil"
 	"os"
 	"path/filepath"
 	"strings"
@@ -33,6 +34,14 @@ func (gd *GitDir) CommitHash(target string) (string, error) {
 		return "", err
 	}
 	return strings.Trim(stdout, "\n"), nil
+}
+
+func (gd *GitDir) Diff(target string) (string, error) {
+	stdout, _, err := gd.WorkDir.RunCommand("git", "diff", target)
+	if err != nil {
+		return "", err
+	}
+	return stdout, nil
 }
 
 func (gd *GitDir) CurrentBranch() (string, error) {
@@ -117,6 +126,23 @@ func (gd *GitDir) Checkout(target string) error {
 
 func (gd *GitDir) Merge(target string) error {
 	_, _, err := gd.WorkDir.RunCommand("git", "merge", "--no-ff", target)
+	if err != nil {
+		return err
+	}
+	return nil
+}
+
+func (gd *GitDir) Apply(patch string) error {
+	tmpFile, err := ioutil.TempFile("", "git-kustomize-diff-apply-")
+	if err != nil {
+		return err
+	}
+	defer (func() {
+		tmpFile.Close()
+		os.Remove(tmpFile.Name())
+	})()
+	tmpFile.Write([]byte(patch))
+	_, _, err = gd.WorkDir.RunCommand("git", "apply", tmpFile.Name())
 	if err != nil {
 		return err
 	}
