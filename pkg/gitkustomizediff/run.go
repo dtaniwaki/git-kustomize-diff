@@ -117,23 +117,36 @@ func Run(dirPath string, opts RunOpts) error {
 	}
 
 	dirs := diffMap.Dirs()
-	fmt.Println("# Git Kustomize Diff")
-	fmt.Printf("dir: %s\n", dirPath)
-	fmt.Printf("base: %s\n", opts.Base)
-	fmt.Printf("target: %s\n", opts.Target)
+	fmt.Printf("# Git Kustomize Diff\n\n")
+	fmt.Println("| name | value |")
+	fmt.Println("|-|-|")
+	fmt.Printf("| dir | %s |\n", dirPath)
+	fmt.Printf("| base | %s |\n", opts.Base)
+	fmt.Printf("| target | %s |\n", opts.Target)
 	fmt.Println("")
 
-	fmt.Printf("## Target Kustomizations\n\n```\n%s\n```\n\n", strings.Join(dirs, "\n"))
-
-	fmt.Printf("## Diff\n")
-	lines := make([]string, len(dirs))
-	for idx, path := range dirs {
-		text := diffMap.Results[path].AsMarkdown()
-		if text != "" {
-			lines[idx] = fmt.Sprintf("### %s:\n%s", path, text)
-		}
+	fmt.Printf("## Target Kustomizations\n\n")
+	if len(dirs) > 0 {
+		fmt.Printf("```\n%s\n```\n\n", strings.Join(dirs, "\n"))
+	} else {
+		fmt.Println("N/A")
 	}
-	fmt.Println(strings.Join(lines, "\n"))
+	fmt.Println("")
+
+	fmt.Printf("## Diff\n\n")
+	if len(dirs) > 0 {
+		lines := make([]string, len(dirs))
+		for idx, path := range dirs {
+			text := diffMap.Results[path].AsMarkdown()
+			if text != "" {
+				lines[idx] = fmt.Sprintf("### %s:\n%s", path, text)
+			}
+		}
+		fmt.Println(strings.Join(lines, "\n"))
+	} else {
+		fmt.Println("N/A")
+	}
+	fmt.Println("")
 
 	return nil
 }
