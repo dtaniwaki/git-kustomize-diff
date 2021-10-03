@@ -111,7 +111,7 @@ func Run(dirPath string, opts RunOpts) error {
 	}
 
 	dirs := diffMap.Dirs()
-	fmt.Printf("# Git Kustomize Diff")
+	fmt.Println("# Git Kustomize Diff")
 	fmt.Printf("## Target Kustomizations\n\n```\n%s\n```\n\n", strings.Join(dirs, "\n"))
 
 	fmt.Printf("## Diff\n")
@@ -119,7 +119,7 @@ func Run(dirPath string, opts RunOpts) error {
 	for idx, path := range dirs {
 		text := diffMap.Results[path].AsMarkdown()
 		if text != "" {
-			lines[idx] = fmt.Sprintf("## %s:\n%s", path, text)
+			lines[idx] = fmt.Sprintf("### %s:\n%s", path, text)
 		}
 	}
 	fmt.Println(strings.Join(lines, "\n"))
