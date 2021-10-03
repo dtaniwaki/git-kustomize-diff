@@ -4,17 +4,19 @@ jobs:
   build:
     runs-on: ubuntu-latest
     steps:
-    - name: set up
+    - name: Set up
       uses: actions/setup-go@v2
       with:
         go-version: ^1.16
-    - uses: actions/checkout@v2
-    - name: build
+    - name: Check out
+      uses: actions/checkout@v2
+    - name: Build
       run: make build
   lint:
     runs-on: ubuntu-latest
     steps:
-    - uses: actions/checkout@v2
+    - name: Check out
+      uses: actions/checkout@v2
     - name: golangci-lint
       uses: golangci/golangci-lint-action@v2
       with:
@@ -22,13 +24,17 @@ jobs:
   test:
     runs-on: ubuntu-latest
     steps:
-    - name: set up
+    - name: Set up
       uses: actions/setup-go@v2
       with:
         go-version: ^1.16
-    - uses: actions/checkout@v2
-    - name: test
+    - name: Check out
+      uses: actions/checkout@v2
+    - name: Test
       run: make test coverage
-    - uses: shogo82148/actions-goveralls@v1
+    - name: Coverage
+      run: make coverage
+    - name: Goveralls
+      uses: shogo82148/actions-goveralls@v1
       with:
         path-to-profile: cover.out
