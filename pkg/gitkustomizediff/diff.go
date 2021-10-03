@@ -29,6 +29,7 @@ import (
 type DiffOpts struct {
 	IncludeRegexp *regexp.Regexp
 	ExcludeRegexp *regexp.Regexp
+	KustomizePath string
 }
 
 func Diff(baseDirPath, targetDirPath string, opts DiffOpts) (*DiffMap, error) {
@@ -69,12 +70,12 @@ func Diff(baseDirPath, targetDirPath string, opts DiffOpts) (*DiffMap, error) {
 				continue
 			}
 		}
-		baseYaml, err := Build(baseKDirPath)
+		baseYaml, err := Build(baseKDirPath, BuildOpts{opts.KustomizePath})
 		if err != nil {
 			diffMap.Results[kDir] = &DiffError{err}
 			continue
 		}
-		targetYaml, err := Build(targetKDirPath)
+		targetYaml, err := Build(targetKDirPath, BuildOpts{opts.KustomizePath})
 		if err != nil {
 			diffMap.Results[kDir] = &DiffError{err}
 			continue
@@ -90,7 +91,18 @@ func Diff(baseDirPath, targetDirPath string, opts DiffOpts) (*DiffMap, error) {
 	return diffMap, nil
 }
 
-func Build(dirPath string) (string, error) {
+type BuildOpts struct {
+	KustomizePath string
+}
+
+func Build(dirPath string, opts BuildOpts) (string, error) {
+	if opts.KustomizePath != "" {
+		stdout, _, err := (&utils.WorkDir{}).RunCommand(opts.KustomizePath, "build", dirPath)
+		if err != nil {
+			return "", err
+		}
+		return stdout, nil
+	}
 	fSys := filesys.MakeFsOnDisk()
 	k := krusty.MakeKustomizer(
 		krusty.MakeDefaultOptions(),

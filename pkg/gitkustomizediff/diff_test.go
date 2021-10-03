@@ -41,7 +41,7 @@ spec:
 `, "\n")
 
 	fixturesDirPath := filepath.Join(wd, "fixtures", "diff", "base", "sub1")
-	actualYaml, err := Build(fixturesDirPath)
+	actualYaml, err := Build(fixturesDirPath, BuildOpts{})
 	if !assert.NoError(t, err) {
 		t.FailNow()
 	}

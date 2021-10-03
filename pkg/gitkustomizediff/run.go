@@ -32,6 +32,7 @@ type RunOpts struct {
 	Target        string
 	IncludeRegexp *regexp.Regexp
 	ExcludeRegexp *regexp.Regexp
+	KustomizePath string
 	Debug         bool
 }
 
@@ -100,6 +101,7 @@ func Run(dirPath string, opts RunOpts) error {
 	diffMap, err := Diff(baseGitDir.WorkDir.Dir, targetGitDir.WorkDir.Dir, DiffOpts{
 		IncludeRegexp: opts.IncludeRegexp,
 		ExcludeRegexp: opts.ExcludeRegexp,
+		KustomizePath: opts.KustomizePath,
 	})
 	if err != nil {
 		return err
