@@ -19,6 +19,7 @@ package cmd
 import (
 	"fmt"
 	"regexp"
+	"strings"
 
 	"github.com/dtaniwaki/git-kustomize-diff/pkg/gitkustomizediff"
 	"github.com/spf13/cobra"
@@ -68,10 +69,13 @@ var runCmd = &cobra.Command{
 		if len(args) == 1 {
 			dir = args[0]
 		}
-		err := gitkustomizediff.Run(dir, opts)
+		diffMap, err := gitkustomizediff.Run(dir, opts)
 		if err != nil {
 			fmt.Printf("%+v\n", err)
 		}
+
+		printDiffMap(dir, opts, diffMap)
+
 		return nil
 	},
 }
@@ -87,4 +91,38 @@ func init() {
 	runCmd.PersistentFlags().StringVar(&runOpts.gitPath, "git-path", "", "path of a git binary (default to git)")
 	runCmd.PersistentFlags().BoolVar(&runOpts.debug, "debug", false, "debug mode")
 	runCmd.PersistentFlags().BoolVar(&runOpts.allowDirty, "allow-dirty", false, "allow dirty tree")
+}
+
+func printDiffMap(dirPath string, opts gitkustomizediff.RunOpts, diffMap *gitkustomizediff.DiffMap) {
+	dirs := diffMap.Dirs()
+	fmt.Printf("# Git Kustomize Diff\n\n")
+	fmt.Println("| name | value |")
+	fmt.Println("|-|-|")
+	fmt.Printf("| dir | %s |\n", dirPath)
+	fmt.Printf("| base | %s |\n", opts.Base)
+	fmt.Printf("| target | %s |\n", opts.Target)
+	fmt.Println("")
+
+	fmt.Printf("## Target Kustomizations\n\n")
+	if len(dirs) > 0 {
+		fmt.Printf("```\n%s\n```\n", strings.Join(dirs, "\n"))
+	} else {
+		fmt.Println("N/A")
+	}
+	fmt.Println("")
+
+	fmt.Printf("## Diff\n\n")
+	lines := make([]string, 0)
+	for _, dir := range dirs {
+		text := diffMap.Results[dir].AsMarkdown()
+		if text != "" {
+			lines = append(lines, fmt.Sprintf("### %s:\n%s", dir, text))
+		}
+	}
+	if len(lines) > 0 {
+		fmt.Println(strings.Join(lines, "\n"))
+	} else {
+		fmt.Println("N/A")
+	}
+	fmt.Println("")
 }
