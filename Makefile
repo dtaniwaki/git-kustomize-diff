@@ -6,13 +6,6 @@ OUTDIR      ?= $(PROJECTROOT)/dist
 
 LDFLAGS := -ldflags="-s -w -X \"github.com/dtaniwaki/git-kustomize-diff/cmd.Version=$(VERSION)\" -X \"github.com/dtaniwaki/git-kustomize-diff/cmd.Revision=$(REVISION)\""
 
-# Get the currently used golang install path (in GOPATH/bin, unless GOBIN is set)
-ifeq (,$(shell go env GOBIN))
-GOBIN=$(shell go env GOPATH)/bin
-else
-GOBIN=$(shell go env GOBIN)
-endif
-
 .PHONY: build
 build:
 	go build $(LDFLAGS) -o $(OUTDIR)/$(NAME)
