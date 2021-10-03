@@ -25,6 +25,23 @@ Or, download the binary from [GitHub Releases](https://github.com/dtaniwaki/git-
 $ git-kustomize-diff run
 ```
 
+Flags:
+
+```
+Usage:
+  git-kustomize-diff run target_dir [flags]
+
+Flags:
+      --allow-dirty             allow dirty tree
+      --base string             base commitish (default to origin/main)
+      --debug                   debug mode
+      --exclude string          exclude regexp (default to none)
+  -h, --help                    help for run
+      --include string          include regexp (default to all)
+      --kustomize-path string   path of a kustomize binary (default to embeded)
+      --target string           target commitish (default to the current branch)
+```
+
 ## Contributing
 
 1. Fork it
