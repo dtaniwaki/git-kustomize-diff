@@ -19,6 +19,7 @@ package gitkustomizediff
 import (
 	"fmt"
 	"io/ioutil"
+	"os"
 	"regexp"
 	"strings"
 
@@ -60,25 +61,28 @@ func Run(dirPath string, opts RunOpts) error {
 		return err
 	}
 
-	log.Info("Clone the git repo for base")
+	log.Infof("Clone the git repo at %s for base", baseCommit)
 	baseDirPath, err := ioutil.TempDir("", "git-kustomize-diff-base-")
 	if err != nil {
 		return err
 	}
+	defer os.RemoveAll(baseDirPath)
 	baseGitDir, err := currentGitDir.CloneAndCheckout(baseDirPath, baseCommit)
 	if err != nil {
 		return err
 	}
 
-	log.Info("Clone the git repo for target")
+	log.Infof("Clone the git repo at %s for target", baseCommit)
 	targetDirPath, err := ioutil.TempDir("", "git-kustomize-diff-target-")
 	if err != nil {
 		return err
 	}
+	defer os.RemoveAll(targetDirPath)
 	targetGitDir, err := currentGitDir.CloneAndCheckout(targetDirPath, baseCommit)
 	if err != nil {
 		return err
 	}
+	log.Infof("Merge the commit at %s into the target repo", targetCommit)
 	err = targetGitDir.Merge(targetCommit)
 	if err != nil {
 		return err
@@ -103,21 +107,21 @@ func Run(dirPath string, opts RunOpts) error {
 
 	fmt.Printf("## Target Kustomizations\n\n")
 	if len(dirs) > 0 {
-		fmt.Printf("```\n%s\n```\n\n", strings.Join(dirs, "\n"))
+		fmt.Printf("```\n%s\n```\n", strings.Join(dirs, "\n"))
 	} else {
 		fmt.Println("N/A")
 	}
 	fmt.Println("")
 
 	fmt.Printf("## Diff\n\n")
-	if len(dirs) > 0 {
-		lines := make([]string, len(dirs))
-		for idx, path := range dirs {
-			text := diffMap.Results[path].AsMarkdown()
-			if text != "" {
-				lines[idx] = fmt.Sprintf("### %s:\n%s", path, text)
-			}
+	lines := make([]string, 0)
+	for idx, dir := range dirs {
+		text := diffMap.Results[dir].AsMarkdown()
+		if text != "" {
+			lines[idx] = fmt.Sprintf("### %s:\n%s", dir, text)
 		}
+	}
+	if len(lines) > 0 {
 		fmt.Println(strings.Join(lines, "\n"))
 	} else {
 		fmt.Println("N/A")

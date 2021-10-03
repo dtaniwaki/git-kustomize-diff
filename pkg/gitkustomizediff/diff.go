@@ -41,10 +41,12 @@ func Diff(baseDirPath, targetDirPath string, opts DiffOpts) (*DiffMap, error) {
 	if err != nil {
 		return nil, err
 	}
+	log.Debugf("base dirs: %+v", baseKDirs)
 	targetKDirs, err := utils.ListKustomizeDirs(targetDirPath, listOpts)
 	if err != nil {
 		return nil, err
 	}
+	log.Debugf("target dirs: %+v", targetKDirs)
 	kDirs := map[string]struct{}{}
 	for _, kDir := range append(baseKDirs, targetKDirs...) {
 		kDirs[kDir] = struct{}{}
