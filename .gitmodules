@@ -1,3 +1,0 @@
-[submodule "pkg/gitkustomizediff/fixtures/run"]
-	path = pkg/gitkustomizediff/fixtures/run
-	url = git@github.com:dtaniwaki/git-kustomize-diff-example.git
