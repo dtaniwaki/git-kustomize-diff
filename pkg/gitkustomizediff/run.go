@@ -32,6 +32,7 @@ type RunOpts struct {
 	Target        string
 	IncludeRegexp *regexp.Regexp
 	ExcludeRegexp *regexp.Regexp
+	Debug         bool
 }
 
 func Run(dirPath string, opts RunOpts) error {
@@ -66,7 +67,11 @@ func Run(dirPath string, opts RunOpts) error {
 	if err != nil {
 		return err
 	}
-	defer os.RemoveAll(baseDirPath)
+	if opts.Debug {
+		log.Infof("Base repo path: %s", baseDirPath)
+	} else {
+		defer os.RemoveAll(baseDirPath)
+	}
 	baseGitDir, err := currentGitDir.CloneAndCheckout(baseDirPath, baseCommit)
 	if err != nil {
 		return err
@@ -77,7 +82,11 @@ func Run(dirPath string, opts RunOpts) error {
 	if err != nil {
 		return err
 	}
-	defer os.RemoveAll(targetDirPath)
+	if opts.Debug {
+		log.Infof("Target repo path: %s", targetDirPath)
+	} else {
+		defer os.RemoveAll(targetDirPath)
+	}
 	targetGitDir, err := currentGitDir.CloneAndCheckout(targetDirPath, baseCommit)
 	if err != nil {
 		return err
@@ -115,10 +124,10 @@ func Run(dirPath string, opts RunOpts) error {
 
 	fmt.Printf("## Diff\n\n")
 	lines := make([]string, 0)
-	for idx, dir := range dirs {
+	for _, dir := range dirs {
 		text := diffMap.Results[dir].AsMarkdown()
 		if text != "" {
-			lines[idx] = fmt.Sprintf("### %s:\n%s", dir, text)
+			lines = append(lines, fmt.Sprintf("### %s:\n%s", dir, text))
 		}
 	}
 	if len(lines) > 0 {

@@ -154,5 +154,5 @@ func (gd *GitDir) CloneAndCheckout(dirPath, commit string) (*GitDir, error) {
 	if err != nil {
 		return nil, err
 	}
-	return gd, nil
+	return gitDir, nil
 }
