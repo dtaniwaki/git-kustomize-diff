@@ -25,11 +25,29 @@ import (
 )
 
 type GitDir struct {
+	GitPath string
 	WorkDir WorkDir
 }
 
+func NewGitDir(dirPath, gitPath string) *GitDir {
+	return &GitDir{
+		GitPath: gitPath,
+		WorkDir: WorkDir{
+			Dir: dirPath,
+		},
+	}
+}
+
+func (gd *GitDir) RunGitCommand(args ...string) (string, string, error) {
+	gitPath := gd.GitPath
+	if gitPath == "" {
+		gitPath = "git"
+	}
+	return gd.WorkDir.RunCommand(gitPath, args...)
+}
+
 func (gd *GitDir) CommitHash(target string) (string, error) {
-	stdout, _, err := gd.WorkDir.RunCommand("git", "rev-parse", "-q", "--short", target)
+	stdout, _, err := gd.RunGitCommand("rev-parse", "-q", "--short", target)
 	if err != nil {
 		return "", err
 	}
@@ -37,7 +55,7 @@ func (gd *GitDir) CommitHash(target string) (string, error) {
 }
 
 func (gd *GitDir) Diff(target string) (string, error) {
-	stdout, _, err := gd.WorkDir.RunCommand("git", "diff", target)
+	stdout, _, err := gd.RunGitCommand("diff", target)
 	if err != nil {
 		return "", err
 	}
@@ -45,7 +63,7 @@ func (gd *GitDir) Diff(target string) (string, error) {
 }
 
 func (gd *GitDir) CurrentBranch() (string, error) {
-	stdout, _, err := gd.WorkDir.RunCommand("git", "branch", "--show-current")
+	stdout, _, err := gd.RunGitCommand("branch", "--show-current")
 	if err != nil {
 		return "", err
 	}
@@ -57,7 +75,7 @@ func (gd *GitDir) Clone(dstDirPath string) (*GitDir, error) {
 	if err != nil {
 		return nil, err
 	}
-	_, _, err = gd.WorkDir.RunCommand("git", "clone", rootDir, dstDirPath)
+	_, _, err = gd.RunGitCommand("clone", rootDir, dstDirPath)
 	if err != nil {
 		return nil, err
 	}
@@ -70,12 +88,13 @@ func (gd *GitDir) Clone(dstDirPath string) (*GitDir, error) {
 		return nil, err
 	}
 	return &GitDir{
+		GitPath: gd.GitPath,
 		WorkDir: WorkDir{Dir: filepath.Join(dstDirPath, relPath)},
 	}, nil
 }
 
 func (gd *GitDir) GetRootDir() (string, error) {
-	baseDirPath, _, err := gd.WorkDir.RunCommand("git", "rev-parse", "--show-toplevel")
+	baseDirPath, _, err := gd.RunGitCommand("rev-parse", "--show-toplevel")
 	if err != nil {
 		return "", err
 	}
@@ -109,7 +128,7 @@ func (gd *GitDir) CopyConfig(targetGitDir *GitDir) error {
 }
 
 func (gd *GitDir) Fetch() error {
-	_, _, err := gd.WorkDir.RunCommand("git", "fetch", "--all")
+	_, _, err := gd.RunGitCommand("fetch", "--all")
 	if err != nil {
 		return err
 	}
@@ -117,7 +136,7 @@ func (gd *GitDir) Fetch() error {
 }
 
 func (gd *GitDir) Checkout(target string) error {
-	_, _, err := gd.WorkDir.RunCommand("git", "checkout", target)
+	_, _, err := gd.RunGitCommand("checkout", target)
 	if err != nil {
 		return err
 	}
@@ -125,7 +144,7 @@ func (gd *GitDir) Checkout(target string) error {
 }
 
 func (gd *GitDir) Merge(target string) error {
-	_, _, err := gd.WorkDir.RunCommand("git", "merge", "--no-ff", target)
+	_, _, err := gd.RunGitCommand("merge", "--no-ff", target)
 	if err != nil {
 		return err
 	}
@@ -145,7 +164,7 @@ func (gd *GitDir) Apply(patch string) error {
 	if err != nil {
 		return err
 	}
-	_, _, err = gd.WorkDir.RunCommand("git", "apply", tmpFile.Name())
+	_, _, err = gd.RunGitCommand("apply", tmpFile.Name())
 	if err != nil {
 		return err
 	}
@@ -155,11 +174,11 @@ func (gd *GitDir) Apply(patch string) error {
 func (gd *GitDir) SetUser() error {
 	email := "anonymous@example.com"
 	name := "anonymous"
-	_, _, err := gd.WorkDir.RunCommand("git", "config", "user.email", email)
+	_, _, err := gd.RunGitCommand("config", "user.email", email)
 	if err != nil {
 		return err
 	}
-	_, _, err = gd.WorkDir.RunCommand("git", "config", "user.name", name)
+	_, _, err = gd.RunGitCommand("config", "user.name", name)
 	if err != nil {
 		return err
 	}

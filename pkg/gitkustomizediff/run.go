@@ -33,17 +33,14 @@ type RunOpts struct {
 	IncludeRegexp *regexp.Regexp
 	ExcludeRegexp *regexp.Regexp
 	KustomizePath string
+	GitPath       string
 	Debug         bool
 	AllowDirty    bool
 }
 
 func Run(dirPath string, opts RunOpts) error {
 	log.Info("Start run")
-	currentGitDir := &utils.GitDir{
-		WorkDir: utils.WorkDir{
-			Dir: dirPath,
-		},
-	}
+	currentGitDir := utils.NewGitDir(dirPath, opts.GitPath)
 	baseCommitish := opts.Base
 	if baseCommitish == "" {
 		baseCommitish = "origin/main"

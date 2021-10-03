@@ -30,6 +30,7 @@ type runFlags struct {
 	includeRegexpString string
 	excludeRegexpString string
 	kustomizePath       string
+	gitPath             string
 	debug               bool
 	allowDirty          bool
 }
@@ -46,6 +47,7 @@ var runCmd = &cobra.Command{
 			Debug:         runOpts.debug,
 			AllowDirty:    runOpts.allowDirty,
 			KustomizePath: runOpts.kustomizePath,
+			GitPath:       runOpts.gitPath,
 		}
 		if runOpts.includeRegexpString != "" {
 			includeRegexp, err := regexp.Compile(runOpts.includeRegexpString)
@@ -82,6 +84,7 @@ func init() {
 	runCmd.PersistentFlags().StringVar(&runOpts.includeRegexpString, "include", "", "include regexp (default to all)")
 	runCmd.PersistentFlags().StringVar(&runOpts.excludeRegexpString, "exclude", "", "exclude regexp (default to none)")
 	runCmd.PersistentFlags().StringVar(&runOpts.kustomizePath, "kustomize-path", "", "path of a kustomize binary (default to embeded)")
+	runCmd.PersistentFlags().StringVar(&runOpts.gitPath, "git-path", "", "path of a git binary (default to git)")
 	runCmd.PersistentFlags().BoolVar(&runOpts.debug, "debug", false, "debug mode")
 	runCmd.PersistentFlags().BoolVar(&runOpts.allowDirty, "allow-dirty", false, "allow dirty tree")
 }
