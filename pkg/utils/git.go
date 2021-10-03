@@ -16,13 +16,85 @@ limitations under the License.
 
 package utils
 
-import "strings"
+import (
+	"io"
+	"os"
+	"path/filepath"
+	"strings"
+)
 
-func GetCommitHash(arg string) (string, error) {
-	wd := &WorkDir{}
-	stdout, _, err := wd.RunCommand("git", "rev-parse", "-q", "--short", arg)
+type GitDir struct {
+	workDir WorkDir
+}
+
+func (gd *GitDir) CommitHash(target string) (string, error) {
+	stdout, _, err := gd.workDir.RunCommand("git", "rev-parse", "-q", "--short", target)
 	if err != nil {
 		return "", err
 	}
 	return strings.Trim(stdout, "\n"), nil
+}
+
+func (gd *GitDir) Clone(dstDirPath string) error {
+	_, _, err := gd.workDir.RunCommand("git", "clone", gd.workDir.Dir, dstDirPath)
+	if err != nil {
+		return err
+	}
+	return nil
+}
+
+func (gd *GitDir) CopyConfig(dstDirPath string) error {
+	src, err := os.Open(filepath.Join(gd.workDir.Dir, ".git", "config"))
+	if err != nil {
+		return err
+	}
+	defer src.Close()
+	dst, err := os.Open(filepath.Join(dstDirPath, ".git", "config"))
+	if err != nil {
+		return err
+	}
+	defer dst.Close()
+	_, err = io.Copy(src, dst)
+	if err != nil {
+		return err
+	}
+	return nil
+}
+
+func (gd *GitDir) Fetch() error {
+	_, _, err := gd.workDir.RunCommand("git", "fetch", "--all")
+	if err != nil {
+		return err
+	}
+	return nil
+}
+
+func (gd *GitDir) Checkout(target string) error {
+	_, _, err := gd.workDir.RunCommand("git", "checkout", target)
+	if err != nil {
+		return err
+	}
+	return nil
+}
+
+func (gd *GitDir) Merge(target string) error {
+	_, _, err := gd.workDir.RunCommand("git", "merge", "--no-ff", target)
+	if err != nil {
+		return err
+	}
+	return nil
+}
+
+func (gd *GitDir) SetUser() error {
+	email := "anonymous@example.com"
+	name := "anonymous"
+	_, _, err := gd.workDir.RunCommand("git", "config", "user.email", email)
+	if err != nil {
+		return err
+	}
+	_, _, err = gd.workDir.RunCommand("git", "config", "user.name", name)
+	if err != nil {
+		return err
+	}
+	return nil
 }
