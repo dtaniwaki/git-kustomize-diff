@@ -25,8 +25,8 @@ import (
 )
 
 type ListKustomizeDirsOpts struct {
-	includeRegexp *regexp.Regexp
-	excludeRegexp *regexp.Regexp
+	IncludeRegexp *regexp.Regexp
+	ExcludeRegexp *regexp.Regexp
 }
 
 func ListKustomizeDirs(dirPath string, opts ListKustomizeDirsOpts) ([]string, error) {
@@ -42,15 +42,15 @@ func ListKustomizeDirs(dirPath string, opts ListKustomizeDirsOpts) ([]string, er
 			return nil
 		}
 		included := true
-		if opts.includeRegexp != nil {
-			m := opts.includeRegexp.Match([]byte(path))
+		if opts.IncludeRegexp != nil {
+			m := opts.IncludeRegexp.Match([]byte(path))
 			if !m {
 				included = false
 			}
 		}
 		if included {
-			if opts.excludeRegexp != nil {
-				m := opts.excludeRegexp.Match([]byte(path))
+			if opts.ExcludeRegexp != nil {
+				m := opts.ExcludeRegexp.Match([]byte(path))
 				if m {
 					included = false
 				}

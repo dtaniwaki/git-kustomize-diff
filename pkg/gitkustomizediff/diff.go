@@ -18,6 +18,7 @@ package gitkustomizediff
 
 import (
 	"path/filepath"
+	"regexp"
 
 	"github.com/dtaniwaki/git-kustomize-diff/pkg/utils"
 	log "github.com/sirupsen/logrus"
@@ -25,13 +26,22 @@ import (
 	"sigs.k8s.io/kustomize/kyaml/filesys"
 )
 
-func Diff(baseDirPath, targetDirPath string) (*DiffMap, error) {
+type DiffOpts struct {
+	IncludeRegexp *regexp.Regexp
+	ExcludeRegexp *regexp.Regexp
+}
+
+func Diff(baseDirPath, targetDirPath string, opts DiffOpts) (*DiffMap, error) {
 	log.Info("Start diff")
-	baseKDirs, err := utils.ListKustomizeDirs(baseDirPath, utils.ListKustomizeDirsOpts{})
+	listOpts := utils.ListKustomizeDirsOpts{
+		IncludeRegexp: opts.IncludeRegexp,
+		ExcludeRegexp: opts.ExcludeRegexp,
+	}
+	baseKDirs, err := utils.ListKustomizeDirs(baseDirPath, listOpts)
 	if err != nil {
 		return nil, err
 	}
-	targetKDirs, err := utils.ListKustomizeDirs(targetDirPath, utils.ListKustomizeDirsOpts{})
+	targetKDirs, err := utils.ListKustomizeDirs(targetDirPath, listOpts)
 	if err != nil {
 		return nil, err
 	}

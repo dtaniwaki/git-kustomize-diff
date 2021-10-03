@@ -19,6 +19,7 @@ package gitkustomizediff
 import (
 	"fmt"
 	"io/ioutil"
+	"regexp"
 	"strings"
 
 	"github.com/dtaniwaki/git-kustomize-diff/pkg/utils"
@@ -26,8 +27,10 @@ import (
 )
 
 type RunOpts struct {
-	Base   string
-	Target string
+	Base          string
+	Target        string
+	IncludeRegexp *regexp.Regexp
+	ExcludeRegexp *regexp.Regexp
 }
 
 func Run(dirPath string, opts RunOpts) error {
@@ -105,7 +108,10 @@ func Run(dirPath string, opts RunOpts) error {
 		return err
 	}
 
-	diffMap, err := Diff(baseGitDir.WorkDir.Dir, targetGitDir.WorkDir.Dir)
+	diffMap, err := Diff(baseGitDir.WorkDir.Dir, targetGitDir.WorkDir.Dir, DiffOpts{
+		IncludeRegexp: opts.IncludeRegexp,
+		ExcludeRegexp: opts.ExcludeRegexp,
+	})
 	if err != nil {
 		return err
 	}

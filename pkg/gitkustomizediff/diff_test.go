@@ -64,7 +64,7 @@ func TestDiff(t *testing.T) {
 
 	baseDirPath := filepath.Join(wd, "fixtures", "diff", "base")
 	targetDirPath := filepath.Join(wd, "fixtures", "diff", "target")
-	diffMap, err := Diff(baseDirPath, targetDirPath)
+	diffMap, err := Diff(baseDirPath, targetDirPath, DiffOpts{})
 	if !assert.NoError(t, err) {
 		t.FailNow()
 	}

@@ -18,14 +18,17 @@ package cmd
 
 import (
 	"fmt"
+	"regexp"
 
 	"github.com/dtaniwaki/git-kustomize-diff/pkg/gitkustomizediff"
 	"github.com/spf13/cobra"
 )
 
 type runFlags struct {
-	base   string
-	target string
+	base                string
+	target              string
+	includeRegexpString string
+	excludeRegexpString string
 }
 
 var runCmd = &cobra.Command{
@@ -33,11 +36,26 @@ var runCmd = &cobra.Command{
 	Short: "Run git-kustomize-diff",
 	Long:  `Run git-kustomize-diff`,
 	Args:  cobra.RangeArgs(0, 1),
-	Run: func(cmd *cobra.Command, args []string) {
+	RunE: func(cmd *cobra.Command, args []string) error {
 		opts := gitkustomizediff.RunOpts{
 			Base:   runOpts.base,
 			Target: runOpts.target,
 		}
+		if runOpts.includeRegexpString != "" {
+			includeRegexp, err := regexp.Compile(runOpts.includeRegexpString)
+			if err != nil {
+				return err
+			}
+			opts.IncludeRegexp = includeRegexp
+		}
+		if runOpts.excludeRegexpString != "" {
+			excludeRegexp, err := regexp.Compile(runOpts.excludeRegexpString)
+			if err != nil {
+				return err
+			}
+			opts.ExcludeRegexp = excludeRegexp
+		}
+
 		dir := "."
 		if len(args) == 1 {
 			dir = args[0]
@@ -46,6 +64,7 @@ var runCmd = &cobra.Command{
 		if err != nil {
 			fmt.Println(err.Error())
 		}
+		return nil
 	},
 }
 
@@ -54,4 +73,6 @@ var runOpts runFlags
 func init() {
 	runCmd.PersistentFlags().StringVar(&runOpts.base, "base", "", "base commitish (default to origin/main)")
 	runCmd.PersistentFlags().StringVar(&runOpts.target, "target", "", "target commitish (default to the current branch)")
+	runCmd.PersistentFlags().StringVar(&runOpts.includeRegexpString, "include", "", "include regexp (default to all)")
+	runCmd.PersistentFlags().StringVar(&runOpts.excludeRegexpString, "exclude", "", "exclude regexp (default to none)")
 }

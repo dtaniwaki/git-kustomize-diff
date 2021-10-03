@@ -38,7 +38,7 @@ func TestListKustomizeDirs(t *testing.T) {
 	}, dirs)
 
 	includeRegexp, _ := regexp.Compile(".*/a$")
-	dirs, err = ListKustomizeDirs(filepath.Join(wd, "fixtures", "kustomize"), ListKustomizeDirsOpts{includeRegexp: includeRegexp})
+	dirs, err = ListKustomizeDirs(filepath.Join(wd, "fixtures", "kustomize"), ListKustomizeDirsOpts{IncludeRegexp: includeRegexp})
 	if !assert.NoError(t, err) {
 		t.FailNow()
 	}
@@ -47,7 +47,7 @@ func TestListKustomizeDirs(t *testing.T) {
 	}, dirs)
 
 	excludeRegexp, _ := regexp.Compile(".*/a$")
-	dirs, err = ListKustomizeDirs(filepath.Join(wd, "fixtures", "kustomize"), ListKustomizeDirsOpts{excludeRegexp: excludeRegexp})
+	dirs, err = ListKustomizeDirs(filepath.Join(wd, "fixtures", "kustomize"), ListKustomizeDirsOpts{ExcludeRegexp: excludeRegexp})
 	if !assert.NoError(t, err) {
 		t.FailNow()
 	}
