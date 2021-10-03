@@ -22,6 +22,8 @@ import (
 	"os"
 	"path/filepath"
 	"strings"
+
+	"github.com/yookoala/realpath"
 )
 
 type GitDir struct {
@@ -79,7 +81,7 @@ func (gd *GitDir) Clone(dstDirPath string) (*GitDir, error) {
 	if err != nil {
 		return nil, err
 	}
-	absPath, err := filepath.Abs(gd.WorkDir.Dir)
+	absPath, err := realpath.Realpath(gd.WorkDir.Dir)
 	if err != nil {
 		return nil, err
 	}
@@ -94,6 +96,7 @@ func (gd *GitDir) Clone(dstDirPath string) (*GitDir, error) {
 }
 
 func (gd *GitDir) GetRootDir() (string, error) {
+	// `git rev-parse --show-toplevel` returns a real path.
 	baseDirPath, _, err := gd.RunGitCommand("rev-parse", "--show-toplevel")
 	if err != nil {
 		return "", err
@@ -106,15 +109,18 @@ func (gd *GitDir) CopyConfig(targetGitDir *GitDir) error {
 	if err != nil {
 		return err
 	}
+	targetDirPath, err := targetGitDir.GetRootDir()
+	if err != nil {
+		return err
+	}
+	if baseDirPath == targetDirPath {
+		return nil
+	}
 	src, err := os.Open(filepath.Join(baseDirPath, ".git", "config"))
 	if err != nil {
 		return err
 	}
 	defer src.Close()
-	targetDirPath, err := targetGitDir.GetRootDir()
-	if err != nil {
-		return err
-	}
 	dst, err := os.Create(filepath.Join(targetDirPath, ".git", "config"))
 	if err != nil {
 		return err
