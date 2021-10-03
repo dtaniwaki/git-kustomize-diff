@@ -65,19 +65,7 @@ func Run(dirPath string, opts RunOpts) error {
 	if err != nil {
 		return err
 	}
-	baseGitDir, err := currentGitDir.Clone(baseDirPath)
-	if err != nil {
-		return err
-	}
-	err = currentGitDir.CopyConfig(baseGitDir)
-	if err != nil {
-		return err
-	}
-	err = baseGitDir.Fetch()
-	if err != nil {
-		return err
-	}
-	err = baseGitDir.Checkout(baseCommit)
+	baseGitDir, err := currentGitDir.CloneAndCheckout(baseDirPath, baseCommit)
 	if err != nil {
 		return err
 	}
@@ -87,19 +75,7 @@ func Run(dirPath string, opts RunOpts) error {
 	if err != nil {
 		return err
 	}
-	targetGitDir, err := currentGitDir.Clone(targetDirPath)
-	if err != nil {
-		return err
-	}
-	err = currentGitDir.CopyConfig(targetGitDir)
-	if err != nil {
-		return err
-	}
-	err = targetGitDir.Fetch()
-	if err != nil {
-		return err
-	}
-	err = targetGitDir.Checkout(baseCommit)
+	targetGitDir, err := currentGitDir.CloneAndCheckout(targetDirPath, baseCommit)
 	if err != nil {
 		return err
 	}

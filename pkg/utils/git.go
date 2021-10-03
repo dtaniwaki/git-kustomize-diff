@@ -136,3 +136,23 @@ func (gd *GitDir) SetUser() error {
 	}
 	return nil
 }
+
+func (gd *GitDir) CloneAndCheckout(dirPath, commit string) (*GitDir, error) {
+	gitDir, err := gd.Clone(dirPath)
+	if err != nil {
+		return nil, err
+	}
+	err = gd.CopyConfig(gitDir)
+	if err != nil {
+		return nil, err
+	}
+	err = gitDir.Fetch()
+	if err != nil {
+		return nil, err
+	}
+	err = gitDir.Checkout(commit)
+	if err != nil {
+		return nil, err
+	}
+	return gd, nil
+}
