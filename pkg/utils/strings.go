@@ -19,7 +19,6 @@ package utils
 import (
 	"io/ioutil"
 	"os"
-	"os/exec"
 	"strings"
 )
 
@@ -52,8 +51,8 @@ func Diff(text1, text2 string) (string, error) {
 
 	stdout, _, err := (&WorkDir{}).RunCommand("diff", "-u", tmpFile1.Name(), tmpFile2.Name())
 	if err != nil {
-		_, ok := err.(*CommandError).InternalError.(*exec.ExitError)
-		if !ok {
+		cmdErr, ok := err.(*CommandError)
+		if !ok || cmdErr.ExitCode() == nil {
 			return "", err
 		}
 	}

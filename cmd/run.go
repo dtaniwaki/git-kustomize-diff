@@ -68,7 +68,7 @@ var runCmd = &cobra.Command{
 		}
 		err := gitkustomizediff.Run(dir, opts)
 		if err != nil {
-			fmt.Println(err.Error())
+			fmt.Printf("%+v\n", err)
 		}
 		return nil
 	},

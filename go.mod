@@ -3,6 +3,7 @@ module github.com/dtaniwaki/git-kustomize-diff
 go 1.16
 
 require (
+	github.com/pkg/errors v0.9.1 // indirect
 	github.com/pmezard/go-difflib v1.0.0 // indirect
 	github.com/sergi/go-diff v1.2.0 // indirect
 	github.com/sirupsen/logrus v1.8.1 // indirect
