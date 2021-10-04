@@ -17,7 +17,6 @@ limitations under the License.
 package utils
 
 import (
-	"fmt"
 	"io/ioutil"
 	"os"
 	"path/filepath"
@@ -163,8 +162,7 @@ func (gd *GitDir) Checkout(target string) error {
 }
 
 func (gd *GitDir) Merge(target string) error {
-	stdout, stderr, err := gd.RunGitCommand("merge", "--no-ff", target)
-	fmt.Printf("stdout: %s\n\nstderr: %s\n", stdout, stderr)
+	_, _, err := gd.RunGitCommand("merge", "--no-ff", target)
 	if err != nil {
 		return err
 	}

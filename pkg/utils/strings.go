@@ -53,8 +53,7 @@ func Diff(text1, text2 string) (string, error) {
 
 	stdout, _, err := (&WorkDir{}).RunCommand("diff", "-u", tmpFile1.Name(), tmpFile2.Name())
 	if err != nil {
-		cmdErr, ok := err.(*CommandError)
-		if !ok || cmdErr.ExitCode() == nil {
+		if GetExitCode(err) == nil {
 			return "", errors.WithStack(err)
 		}
 	}

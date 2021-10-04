@@ -25,10 +25,6 @@ import (
 	"github.com/pkg/errors"
 )
 
-type WithFormat interface {
-	Format(fmt.State, rune)
-}
-
 type WithCause interface {
 	Cause() error
 }
@@ -40,23 +36,23 @@ type CommandError struct {
 }
 
 func (ce *CommandError) Error() string {
-	return fmt.Sprintf("%s\n\nstdout:\n%s\n\nstderr:\n%s", ce.InternalError, ce.Stdout, ce.Stderr)
+	return fmt.Sprintf("%s\n\n[stdout]\n%s\n\n[stderr]\n%s", ce.InternalError, ce.Stdout, ce.Stderr)
 }
 
-func (ce *CommandError) Cause() error {
-	return ce.InternalError.(WithCause).Cause()
-}
-
-func (ce *CommandError) Format(s fmt.State, verb rune) {
-	ce.InternalError.(WithFormat).Format(s, verb)
-}
-
-func (ce *CommandError) ExitCode() *int {
-	err, ok := ce.Cause().(*exec.ExitError)
+func GetExitCode(err error) *int {
+	cause, ok := err.(WithCause)
 	if !ok {
 		return nil
 	}
-	code := err.ExitCode()
+	cmdErr, ok := cause.Cause().(*CommandError)
+	if !ok {
+		return nil
+	}
+	exitErr, ok := cmdErr.InternalError.(*exec.ExitError)
+	if !ok {
+		return nil
+	}
+	code := exitErr.ExitCode()
 	return &code
 }
 
@@ -80,11 +76,11 @@ func (wd *WorkDir) RunCommand(command string, args ...string) (string, string, e
 	cmd.Stderr = stderr
 	err := cmd.Run()
 	if err != nil {
-		err = &CommandError{
-			InternalError: errors.WithStack(err),
+		err = errors.WithStack(&CommandError{
+			InternalError: err,
 			Stdout:        stdout.String(),
 			Stderr:        stderr.String(),
-		}
+		})
 	}
 	return stdout.String(), stderr.String(), err
 }
