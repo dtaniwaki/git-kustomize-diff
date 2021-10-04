@@ -54,7 +54,6 @@ func TestRun(t *testing.T) {
 	diffMap, err := Run(tmpGitDir, RunOpts{
 		Base:   "origin/main",
 		Target: "origin/a-branch",
-		Debug:  true,
 	})
 	if !assert.NoError(t, err) {
 		t.FailNow()
