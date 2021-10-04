@@ -139,6 +139,6 @@ func printRunResult(dirPath string, opts gitkustomizediff.RunOpts, res *gitkusto
 		}
 	}
 	if !found {
-		fmt.Println("N/A")
+		fmt.Println(":tada::tada: No Diff :tada::tada:")
 	}
 }
