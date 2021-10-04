@@ -18,6 +18,7 @@ package cmd
 
 import (
 	"fmt"
+	"os"
 	"regexp"
 	"strings"
 
@@ -72,7 +73,7 @@ var runCmd = &cobra.Command{
 		res, err := gitkustomizediff.Run(dir, opts)
 		if err != nil {
 			fmt.Printf("%+v\n", err)
-			return nil
+			os.Exit(1)
 		}
 
 		printRunResult(dir, opts, res)
