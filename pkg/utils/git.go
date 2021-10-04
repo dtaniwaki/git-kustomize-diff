@@ -17,7 +17,6 @@ limitations under the License.
 package utils
 
 import (
-	"io"
 	"io/ioutil"
 	"os"
 	"path/filepath"
@@ -127,10 +126,18 @@ func (gd *GitDir) CopyConfig(targetGitDir *GitDir) error {
 		return errors.WithStack(err)
 	}
 	defer dst.Close()
-	_, err = io.Copy(src, dst)
+
+	// Manual copy as io.Copy copy_file_range has some problem in some situation.
+	bs := []byte{}
+	_, err = src.Read(bs)
 	if err != nil {
 		return errors.WithStack(err)
 	}
+	_, err = dst.Write(bs)
+	if err != nil {
+		return errors.WithStack(err)
+	}
+
 	return nil
 }
 
