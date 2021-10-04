@@ -84,7 +84,7 @@ var runCmd = &cobra.Command{
 var runOpts runFlags
 
 func init() {
-	runCmd.PersistentFlags().StringVar(&runOpts.base, "base", "", "base commitish (default to origin/main)")
+	runCmd.PersistentFlags().StringVar(&runOpts.base, "base", "origin/main", "base commitish")
 	runCmd.PersistentFlags().StringVar(&runOpts.target, "target", "", "target commitish (default to the current branch)")
 	runCmd.PersistentFlags().StringVar(&runOpts.includeRegexpString, "include", "", "include regexp (default to all)")
 	runCmd.PersistentFlags().StringVar(&runOpts.excludeRegexpString, "exclude", "", "exclude regexp (default to none)")
