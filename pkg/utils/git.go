@@ -214,7 +214,7 @@ func (gd *GitDir) CloneAndCheckout(dirPath, commit string) (*GitDir, error) {
 	if err != nil {
 		return nil, err
 	}
-	err = gd.SetUser()
+	err = gitDir.SetUser()
 	if err != nil {
 		return nil, err
 	}
