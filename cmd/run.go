@@ -69,12 +69,12 @@ var runCmd = &cobra.Command{
 		if len(args) == 1 {
 			dir = args[0]
 		}
-		diffMap, err := gitkustomizediff.Run(dir, opts)
+		res, err := gitkustomizediff.Run(dir, opts)
 		if err != nil {
 			fmt.Printf("%+v\n", err)
 		}
 
-		printDiffMap(dir, opts, diffMap)
+		printRunResult(dir, opts, res)
 
 		return nil
 	},
@@ -93,36 +93,40 @@ func init() {
 	runCmd.PersistentFlags().BoolVar(&runOpts.allowDirty, "allow-dirty", false, "allow dirty tree")
 }
 
-func printDiffMap(dirPath string, opts gitkustomizediff.RunOpts, diffMap *gitkustomizediff.DiffMap) {
-	dirs := diffMap.Dirs()
+func printRunResult(dirPath string, opts gitkustomizediff.RunOpts, res *gitkustomizediff.RunResult) {
+	dirs := res.DiffMap.Dirs()
 	fmt.Printf("# Git Kustomize Diff\n\n")
+
+	fmt.Printf("%s...%s\n\n", res.BaseCommit, res.TargetCommit)
+
+	fmt.Printf("<details><summary>Options</summary>\n\n")
 	fmt.Println("| name | value |")
 	fmt.Println("|-|-|")
 	fmt.Printf("| dir | %s |\n", dirPath)
 	fmt.Printf("| base | %s |\n", opts.Base)
 	fmt.Printf("| target | %s |\n", opts.Target)
-	fmt.Println("")
+	fmt.Printf("\n</details>\n\n")
 
-	fmt.Printf("## Target Kustomizations\n\n")
+	fmt.Printf("<details><summary>Target Kustomizations</summary>\n\n")
 	if len(dirs) > 0 {
 		fmt.Printf("```\n%s\n```\n", strings.Join(dirs, "\n"))
 	} else {
 		fmt.Println("N/A")
 	}
-	fmt.Println("")
+	fmt.Printf("\n</details>\n\n")
 
-	fmt.Printf("## Diff\n\n")
-	lines := make([]string, 0)
+	found := false
 	for _, dir := range dirs {
-		text := diffMap.Results[dir].AsMarkdown()
+		text := res.DiffMap.Results[dir].AsMarkdown()
 		if text != "" {
-			lines = append(lines, fmt.Sprintf("### %s:\n%s", dir, text))
+			fmt.Printf("## %s\n\n", dir)
+			fmt.Printf("<details><summary>diff</summary>\n\n")
+			fmt.Println(text)
+			fmt.Printf("\n</details>\n\n")
+			found = true
 		}
 	}
-	if len(lines) > 0 {
-		fmt.Println(strings.Join(lines, "\n"))
-	} else {
+	if !found {
 		fmt.Println("N/A")
 	}
-	fmt.Println("")
 }

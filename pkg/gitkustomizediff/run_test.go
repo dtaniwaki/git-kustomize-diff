@@ -51,13 +51,15 @@ func TestRun(t *testing.T) {
 	if !assert.NoError(t, err) {
 		t.FailNow()
 	}
-	diffMap, err := Run(tmpGitDir, RunOpts{
+	res, err := Run(tmpGitDir, RunOpts{
 		Base:   "origin/main",
 		Target: "origin/a-branch",
 	})
 	if !assert.NoError(t, err) {
 		t.FailNow()
 	}
-	assert.Equal(t, []string{"foo"}, diffMap.Dirs())
-	assert.Equal(t, expectedFooDiff, diffMap.Results["foo"].ToString())
+	assert.Equal(t, "6206e0c", res.BaseCommit)
+	assert.Equal(t, "5a1c160", res.TargetCommit)
+	assert.Equal(t, []string{"foo"}, res.DiffMap.Dirs())
+	assert.Equal(t, expectedFooDiff, res.DiffMap.Results["foo"].ToString())
 }

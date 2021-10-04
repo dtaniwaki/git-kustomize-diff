@@ -37,7 +37,13 @@ type RunOpts struct {
 	AllowDirty    bool
 }
 
-func Run(dirPath string, opts RunOpts) (*DiffMap, error) {
+type RunResult struct {
+	BaseCommit   string
+	TargetCommit string
+	DiffMap      *DiffMap
+}
+
+func Run(dirPath string, opts RunOpts) (*RunResult, error) {
 	log.Info("Start run")
 	currentGitDir := utils.NewGitDir(dirPath, opts.GitPath)
 	baseCommitish := opts.Base
@@ -121,5 +127,9 @@ func Run(dirPath string, opts RunOpts) (*DiffMap, error) {
 		return nil, err
 	}
 
-	return diffMap, nil
+	return &RunResult{
+		BaseCommit:   baseCommit,
+		TargetCommit: targetCommit,
+		DiffMap:      diffMap,
+	}, nil
 }
