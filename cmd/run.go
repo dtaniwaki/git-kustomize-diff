@@ -107,6 +107,8 @@ func printRunResult(dirPath string, opts gitkustomizediff.RunOpts, res *gitkusto
 	fmt.Printf("| dir | %s |\n", dirPath)
 	fmt.Printf("| base | %s |\n", opts.Base)
 	fmt.Printf("| target | %s |\n", opts.Target)
+	fmt.Printf("| include | %s |\n", opts.IncludeRegexp)
+	fmt.Printf("| exclude | %s |\n", opts.ExcludeRegexp)
 	fmt.Printf("\n</details>\n\n")
 
 	fmt.Printf("<details><summary>Target Kustomizations</summary>\n\n")
