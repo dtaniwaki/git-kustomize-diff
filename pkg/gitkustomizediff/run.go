@@ -22,6 +22,7 @@ import (
 	"regexp"
 
 	"github.com/dtaniwaki/git-kustomize-diff/pkg/utils"
+	"github.com/pkg/errors"
 	log "github.com/sirupsen/logrus"
 )
 
@@ -72,7 +73,7 @@ func Run(dirPath string, opts RunOpts) (*DiffMap, error) {
 	log.Infof("Clone the git repo at %s for base", baseCommit)
 	baseDirPath, err := ioutil.TempDir("", "git-kustomize-diff-base-")
 	if err != nil {
-		return nil, err
+		return nil, errors.WithStack(err)
 	}
 	if opts.Debug {
 		log.Infof("Base repo path: %s", baseDirPath)
@@ -87,7 +88,7 @@ func Run(dirPath string, opts RunOpts) (*DiffMap, error) {
 	log.Infof("Clone the git repo at %s for target", baseCommit)
 	targetDirPath, err := ioutil.TempDir("", "git-kustomize-diff-target-")
 	if err != nil {
-		return nil, err
+		return nil, errors.WithStack(err)
 	}
 	if opts.Debug {
 		log.Infof("Target repo path: %s", targetDirPath)

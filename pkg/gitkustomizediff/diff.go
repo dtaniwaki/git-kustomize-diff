@@ -21,6 +21,7 @@ import (
 	"regexp"
 
 	"github.com/dtaniwaki/git-kustomize-diff/pkg/utils"
+	"github.com/pkg/errors"
 	log "github.com/sirupsen/logrus"
 	"sigs.k8s.io/kustomize/api/krusty"
 	"sigs.k8s.io/kustomize/kyaml/filesys"
@@ -109,11 +110,11 @@ func Build(dirPath string, opts BuildOpts) (string, error) {
 	)
 	resMap, err := k.Run(fSys, dirPath)
 	if err != nil {
-		return "", err
+		return "", errors.WithStack(err)
 	}
 	bs, err := resMap.AsYaml()
 	if err != nil {
-		return "", err
+		return "", errors.WithStack(err)
 	}
 	return string(bs), nil
 }

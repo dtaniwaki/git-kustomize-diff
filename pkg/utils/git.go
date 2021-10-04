@@ -23,6 +23,7 @@ import (
 	"path/filepath"
 	"strings"
 
+	"github.com/pkg/errors"
 	"github.com/yookoala/realpath"
 )
 
@@ -118,17 +119,17 @@ func (gd *GitDir) CopyConfig(targetGitDir *GitDir) error {
 	}
 	src, err := os.Open(filepath.Join(baseDirPath, ".git", "config"))
 	if err != nil {
-		return err
+		return errors.WithStack(err)
 	}
 	defer src.Close()
 	dst, err := os.Create(filepath.Join(targetDirPath, ".git", "config"))
 	if err != nil {
-		return err
+		return errors.WithStack(err)
 	}
 	defer dst.Close()
 	_, err = io.Copy(src, dst)
 	if err != nil {
-		return err
+		return errors.WithStack(err)
 	}
 	return nil
 }
@@ -160,7 +161,7 @@ func (gd *GitDir) Merge(target string) error {
 func (gd *GitDir) Apply(patch string) error {
 	tmpFile, err := ioutil.TempFile("", "git-kustomize-diff-apply-")
 	if err != nil {
-		return err
+		return errors.WithStack(err)
 	}
 	defer (func() {
 		tmpFile.Close()
@@ -168,7 +169,7 @@ func (gd *GitDir) Apply(patch string) error {
 	})()
 	_, err = tmpFile.Write([]byte(patch))
 	if err != nil {
-		return err
+		return errors.WithStack(err)
 	}
 	_, _, err = gd.RunGitCommand("apply", tmpFile.Name())
 	if err != nil {

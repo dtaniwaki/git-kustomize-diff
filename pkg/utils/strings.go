@@ -20,12 +20,14 @@ import (
 	"io/ioutil"
 	"os"
 	"strings"
+
+	"github.com/pkg/errors"
 )
 
 func Diff(text1, text2 string) (string, error) {
 	tmpFile1, err := ioutil.TempFile("", "git-kustomize-diff-diff-")
 	if err != nil {
-		return "", err
+		return "", errors.WithStack(err)
 	}
 	defer (func() {
 		tmpFile1.Close()
@@ -33,12 +35,12 @@ func Diff(text1, text2 string) (string, error) {
 	})()
 	_, err = tmpFile1.Write([]byte(text1))
 	if err != nil {
-		return "", err
+		return "", errors.WithStack(err)
 	}
 
 	tmpFile2, err := ioutil.TempFile("", "git-kustomize-diff-diff-")
 	if err != nil {
-		return "", err
+		return "", errors.WithStack(err)
 	}
 	defer (func() {
 		tmpFile2.Close()
@@ -46,14 +48,14 @@ func Diff(text1, text2 string) (string, error) {
 	})()
 	_, err = tmpFile2.Write([]byte(text2))
 	if err != nil {
-		return "", err
+		return "", errors.WithStack(err)
 	}
 
 	stdout, _, err := (&WorkDir{}).RunCommand("diff", "-u", tmpFile1.Name(), tmpFile2.Name())
 	if err != nil {
 		cmdErr, ok := err.(*CommandError)
 		if !ok || cmdErr.ExitCode() == nil {
-			return "", err
+			return "", errors.WithStack(err)
 		}
 	}
 

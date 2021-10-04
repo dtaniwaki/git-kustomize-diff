@@ -22,6 +22,8 @@ import (
 	"os"
 	"path/filepath"
 	"regexp"
+
+	"github.com/pkg/errors"
 )
 
 type ListKustomizeDirsOpts struct {
@@ -33,7 +35,7 @@ func ListKustomizeDirs(dirPath string, opts ListKustomizeDirsOpts) ([]string, er
 	targetFiles := make([]string, 0)
 	err := filepath.WalkDir(dirPath, func(path string, d fs.DirEntry, err error) error {
 		if err != nil {
-			return err
+			return errors.WithStack(err)
 		}
 		if !d.IsDir() {
 			return nil
@@ -59,7 +61,7 @@ func ListKustomizeDirs(dirPath string, opts ListKustomizeDirsOpts) ([]string, er
 		if included {
 			relPath, err := filepath.Rel(dirPath, path)
 			if err != nil {
-				return err
+				return errors.WithStack(err)
 			}
 			targetFiles = append(targetFiles, relPath)
 		}
@@ -78,7 +80,7 @@ func KustomizationExists(path string) bool {
 func MakeKustomizeDir(dirPath string) error {
 	err := os.MkdirAll(dirPath, 0700)
 	if err != nil {
-		return err
+		return errors.WithStack(err)
 	}
 	kustomizationFilePath := filepath.Join(dirPath, "kustomization.yaml")
 	if Exists(kustomizationFilePath) {
@@ -86,7 +88,7 @@ func MakeKustomizeDir(dirPath string) error {
 	}
 	f, err := os.Create(kustomizationFilePath)
 	if err != nil {
-		return err
+		return errors.WithStack(err)
 	}
 	defer f.Close()
 	return nil
