@@ -13,8 +13,17 @@ Check diff of your kustomize directory.
 
 ## Installation
 
+Install from the Go source code:
+
 ```bash
 $ go install -u github.com/dtaniwaki/git-kustomize-diff
+```
+
+For MacOS, use Homebrew:
+
+```bash
+brew tap dtaniwaki/git-kustomize-diff
+brew install git-kustomize-diff
 ```
 
 Or, download the binary from [GitHub Releases](https://github.com/dtaniwaki/git-kustomize-diff/releases) and put it in your `$PATH`.
