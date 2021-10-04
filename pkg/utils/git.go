@@ -128,7 +128,11 @@ func (gd *GitDir) CopyConfig(targetGitDir *GitDir) error {
 	defer dst.Close()
 
 	// Manual copy as io.Copy copy_file_range has some problem in some situation.
-	bs := []byte{}
+	st, err := src.Stat()
+	if err != nil {
+		return errors.WithStack(err)
+	}
+	bs := make([]byte, st.Size())
 	_, err = src.Read(bs)
 	if err != nil {
 		return errors.WithStack(err)
