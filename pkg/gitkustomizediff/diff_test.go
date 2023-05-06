@@ -24,7 +24,43 @@ import (
 	"testing"
 
 	"github.com/stretchr/testify/assert"
+	"sigs.k8s.io/kustomize/api/krusty"
+	"sigs.k8s.io/kustomize/api/types"
 )
+
+func TestMakeBuildOptions(t *testing.T) {
+	var err error
+	var kustomizeLoadRestrictor string
+	var options *krusty.Options
+	defaultOptions := krusty.MakeDefaultOptions()
+
+	kustomizeLoadRestrictor = ""
+	options, err = MakeBuildOptions(kustomizeLoadRestrictor)
+	assert.Equal(t, err, nil)
+	assert.Equal(t, options, defaultOptions)
+
+	kustomizeLoadRestrictor = "LoadRestrictionsUnknown"
+	options, err = MakeBuildOptions(kustomizeLoadRestrictor)
+	assert.Equal(t, err, nil)
+	assert.Equal(t, options.LoadRestrictions, types.LoadRestrictionsUnknown)
+
+	kustomizeLoadRestrictor = "LoadRestrictionsRootOnly"
+	options, err = MakeBuildOptions(kustomizeLoadRestrictor)
+	assert.Equal(t, err, nil)
+	assert.Equal(t, options.LoadRestrictions, types.LoadRestrictionsRootOnly)
+
+	kustomizeLoadRestrictor = "LoadRestrictionsNone"
+	options, err = MakeBuildOptions(kustomizeLoadRestrictor)
+	assert.Equal(t, err, nil)
+	assert.Equal(t, options.LoadRestrictions, types.LoadRestrictionsNone)
+
+	invalidType := "invalid-load-restrictions-type--"
+	kustomizeLoadRestrictor = invalidType
+	options, err = MakeBuildOptions(kustomizeLoadRestrictor)
+	assert.Equal(t, options, (*krusty.Options)(nil))
+	assert.NotEqual(t, err, nil)
+	assert.Error(t, err, "unknown LoadRestrictions type given by kustomizeLoadRestrictor: %q", invalidType)
+}
 
 func TestBuild(t *testing.T) {
 	wd, _ := os.Getwd()
@@ -45,6 +81,33 @@ spec:
 	if !assert.NoError(t, err) {
 		t.FailNow()
 	}
+	assert.Equal(t, expectedYaml, actualYaml)
+}
+
+func TestBuildLoadRestrictionsNone(t *testing.T) {
+	wd, _ := os.Getwd()
+
+	expectedYaml := strings.TrimLeft(`
+apiVersion: v1
+kind: Pod
+metadata:
+  name: sub1
+spec:
+  containers:
+  - image: nginx:latest
+    name: sub1
+`, "\n")
+
+	fixturesDirPath := filepath.Join(wd, "fixtures", "diff-load-restrictions-none", "base", "sub1/nested")
+	_, err := Build(fixturesDirPath, BuildOpts{})
+	assert.NotEqual(t, err, nil)
+
+	buildOpts := BuildOpts{"", "LoadRestrictionsNone"}
+	actualYaml, err := Build(fixturesDirPath, buildOpts)
+	if !assert.NoError(t, err) {
+		t.FailNow()
+	}
+
 	assert.Equal(t, expectedYaml, actualYaml)
 }
 
@@ -72,4 +135,32 @@ func TestDiff(t *testing.T) {
 	assert.Equal(t, expectedSub1Diff, diffMap.Results["sub1"].(*DiffContent).ToString())
 	assert.Equal(t, expectedSub2Diff, diffMap.Results["sub2"].(*DiffContent).ToString())
 	assert.Regexp(t, expectedInvalidErrorRegexp, diffMap.Results["invalid"].(*DiffError).Error().Error())
+}
+
+func TestDiffLoadRestrictionsNone(t *testing.T) {
+	wd, _ := os.Getwd()
+
+	expectedSub1Diff := strings.TrimLeft(`
+@@ -5,4 +5,4 @@
+ spec:
+   containers:
+   - image: nginx:latest
+-    name: sub1
++    name: sub1-modified
+`, "\n")
+
+	baseDirPath := filepath.Join(wd, "fixtures", "diff-load-restrictions-none", "base")
+	targetDirPath := filepath.Join(wd, "fixtures", "diff-load-restrictions-none", "target")
+	_, err := Diff(baseDirPath, targetDirPath, DiffOpts{})
+	if !assert.NoError(t, err) {
+		t.FailNow()
+	}
+
+	diffOpts := DiffOpts{nil, nil, "", "LoadRestrictionsNone"}
+	diffMap, err := Diff(baseDirPath, targetDirPath, diffOpts)
+	if !assert.NoError(t, err) {
+		t.FailNow()
+	}
+	assert.Equal(t, 1, len(diffMap.Results))
+	assert.Equal(t, expectedSub1Diff, diffMap.Results["sub1/nested"].(*DiffContent).ToString())
 }
