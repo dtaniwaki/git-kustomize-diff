@@ -30,3 +30,6 @@ testbin/*
 # Misc
 dist/
 .vscode/
+
+# Release artifacts
+git-kustomize-diff

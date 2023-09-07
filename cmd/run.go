@@ -27,14 +27,15 @@ import (
 )
 
 type runFlags struct {
-	base                string
-	target              string
-	includeRegexpString string
-	excludeRegexpString string
-	kustomizePath       string
-	gitPath             string
-	debug               bool
-	allowDirty          bool
+	base                    string
+	target                  string
+	includeRegexpString     string
+	excludeRegexpString     string
+	kustomizePath           string
+	kustomizeLoadRestrictor string
+	gitPath                 string
+	debug                   bool
+	allowDirty              bool
 }
 
 var runCmd = &cobra.Command{
@@ -44,12 +45,13 @@ var runCmd = &cobra.Command{
 	Args:  cobra.RangeArgs(0, 1),
 	RunE: func(cmd *cobra.Command, args []string) error {
 		opts := gitkustomizediff.RunOpts{
-			Base:          runOpts.base,
-			Target:        runOpts.target,
-			Debug:         runOpts.debug,
-			AllowDirty:    runOpts.allowDirty,
-			KustomizePath: runOpts.kustomizePath,
-			GitPath:       runOpts.gitPath,
+			Base:                    runOpts.base,
+			Target:                  runOpts.target,
+			Debug:                   runOpts.debug,
+			AllowDirty:              runOpts.allowDirty,
+			KustomizePath:           runOpts.kustomizePath,
+			KustomizeLoadRestrictor: runOpts.kustomizeLoadRestrictor,
+			GitPath:                 runOpts.gitPath,
 		}
 		if runOpts.includeRegexpString != "" {
 			includeRegexp, err := regexp.Compile(runOpts.includeRegexpString)
@@ -89,7 +91,8 @@ func init() {
 	runCmd.PersistentFlags().StringVar(&runOpts.target, "target", "", "target commitish (default to the current branch)")
 	runCmd.PersistentFlags().StringVar(&runOpts.includeRegexpString, "include", "", "include regexp (default to all)")
 	runCmd.PersistentFlags().StringVar(&runOpts.excludeRegexpString, "exclude", "", "exclude regexp (default to none)")
-	runCmd.PersistentFlags().StringVar(&runOpts.kustomizePath, "kustomize-path", "", "path of a kustomize binary (default to embeded)")
+	runCmd.PersistentFlags().StringVar(&runOpts.kustomizePath, "kustomize-path", "", "path of a kustomize binary (default to embedded)")
+	runCmd.PersistentFlags().StringVar(&runOpts.kustomizeLoadRestrictor, "kustomize-load-restrictor", "", "kustomize load restrictor type (default to kustomizaton provider defaults)")
 	runCmd.PersistentFlags().StringVar(&runOpts.gitPath, "git-path", "", "path of a git binary (default to git)")
 	runCmd.PersistentFlags().BoolVar(&runOpts.debug, "debug", false, "debug mode")
 	runCmd.PersistentFlags().BoolVar(&runOpts.allowDirty, "allow-dirty", false, "allow dirty tree")

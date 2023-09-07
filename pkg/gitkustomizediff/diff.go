@@ -24,13 +24,15 @@ import (
 	"github.com/pkg/errors"
 	log "github.com/sirupsen/logrus"
 	"sigs.k8s.io/kustomize/api/krusty"
+	"sigs.k8s.io/kustomize/api/types"
 	"sigs.k8s.io/kustomize/kyaml/filesys"
 )
 
 type DiffOpts struct {
-	IncludeRegexp *regexp.Regexp
-	ExcludeRegexp *regexp.Regexp
-	KustomizePath string
+	IncludeRegexp           *regexp.Regexp
+	ExcludeRegexp           *regexp.Regexp
+	KustomizePath           string
+	KustomizeLoadRestrictor string
 }
 
 func Diff(baseDirPath, targetDirPath string, opts DiffOpts) (*DiffMap, error) {
@@ -71,12 +73,12 @@ func Diff(baseDirPath, targetDirPath string, opts DiffOpts) (*DiffMap, error) {
 				continue
 			}
 		}
-		baseYaml, err := Build(baseKDirPath, BuildOpts{opts.KustomizePath})
+		baseYaml, err := Build(baseKDirPath, BuildOpts{opts.KustomizePath, opts.KustomizeLoadRestrictor})
 		if err != nil {
 			diffMap.Results[kDir] = &DiffError{err}
 			continue
 		}
-		targetYaml, err := Build(targetKDirPath, BuildOpts{opts.KustomizePath})
+		targetYaml, err := Build(targetKDirPath, BuildOpts{opts.KustomizePath, opts.KustomizeLoadRestrictor})
 		if err != nil {
 			diffMap.Results[kDir] = &DiffError{err}
 			continue
@@ -92,22 +94,61 @@ func Diff(baseDirPath, targetDirPath string, opts DiffOpts) (*DiffMap, error) {
 	return diffMap, nil
 }
 
+func MakeBuildOptions(kustomizeLoadRestrictor string) (*krusty.Options, error) {
+	var err error
+	options := krusty.MakeDefaultOptions()
+	if kustomizeLoadRestrictor == "" {
+		return options, err
+	}
+	switch kustomizeLoadRestrictor {
+	case "LoadRestrictionsUnknown":
+		{
+			options.LoadRestrictions = types.LoadRestrictionsUnknown
+		}
+	case "LoadRestrictionsRootOnly":
+		{
+			options.LoadRestrictions = types.LoadRestrictionsRootOnly
+		}
+	case "LoadRestrictionsNone":
+		{
+			options.LoadRestrictions = types.LoadRestrictionsNone
+		}
+	default:
+		{
+			err := errors.Errorf("unknown LoadRestrictions type given by kustomizeLoadRestrictor: %q", kustomizeLoadRestrictor)
+			return nil, err
+		}
+	}
+	return options, err
+}
+
 type BuildOpts struct {
-	KustomizePath string
+	KustomizePath           string
+	KustomizeLoadRestrictor string
 }
 
 func Build(dirPath string, opts BuildOpts) (string, error) {
 	if opts.KustomizePath != "" {
-		stdout, _, err := (&utils.WorkDir{}).RunCommand(opts.KustomizePath, "build", dirPath)
+		buildArgs := []string {"build"}
+		if (opts.KustomizeLoadRestrictor != "") {
+			buildArgs = append(buildArgs, "--load-restrictor")
+			buildArgs = append(buildArgs, opts.KustomizeLoadRestrictor)
+		}
+		buildArgs = append(buildArgs, dirPath)
+		stdout, _, err := (&utils.WorkDir{}).RunCommand(opts.KustomizePath, buildArgs...)
 		if err != nil {
 			return "", err
 		}
 		return stdout, nil
 	}
-	fSys := filesys.MakeFsOnDisk()
+	options, err := MakeBuildOptions(opts.KustomizeLoadRestrictor)
+	if err != nil {
+		return "", errors.WithStack(err)
+	}
 	k := krusty.MakeKustomizer(
-		krusty.MakeDefaultOptions(),
+		options,
 	)
+	fSys := filesys.MakeFsOnDisk()
 	resMap, err := k.Run(fSys, dirPath)
 	if err != nil {
 		return "", errors.WithStack(err)

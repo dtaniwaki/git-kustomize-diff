@@ -27,14 +27,15 @@ import (
 )
 
 type RunOpts struct {
-	Base          string
-	Target        string
-	IncludeRegexp *regexp.Regexp
-	ExcludeRegexp *regexp.Regexp
-	KustomizePath string
-	GitPath       string
-	Debug         bool
-	AllowDirty    bool
+	Base                    string
+	Target                  string
+	IncludeRegexp           *regexp.Regexp
+	ExcludeRegexp           *regexp.Regexp
+	KustomizePath           string
+	KustomizeLoadRestrictor string
+	GitPath                 string
+	Debug                   bool
+	AllowDirty              bool
 }
 
 type RunResult struct {
@@ -119,9 +120,10 @@ func Run(dirPath string, opts RunOpts) (*RunResult, error) {
 	}
 
 	diffMap, err := Diff(baseGitDir.WorkDir.Dir, targetGitDir.WorkDir.Dir, DiffOpts{
-		IncludeRegexp: opts.IncludeRegexp,
-		ExcludeRegexp: opts.ExcludeRegexp,
-		KustomizePath: opts.KustomizePath,
+		IncludeRegexp:           opts.IncludeRegexp,
+		ExcludeRegexp:           opts.ExcludeRegexp,
+		KustomizePath:           opts.KustomizePath,
+		KustomizeLoadRestrictor: opts.KustomizeLoadRestrictor,
 	})
 	if err != nil {
 		return nil, err

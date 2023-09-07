@@ -41,14 +41,16 @@ Usage:
   git-kustomize-diff run target_dir [flags]
 
 Flags:
-      --allow-dirty             allow dirty tree
-      --base string             base commitish (default to origin/main)
-      --debug                   debug mode
-      --exclude string          exclude regexp (default to none)
-  -h, --help                    help for run
-      --include string          include regexp (default to all)
-      --kustomize-path string   path of a kustomize binary (default to embeded)
-      --target string           target commitish (default to the current branch)
+      --allow-dirty                        allow dirty tree
+      --base string                        base commitish (default to origin/main)
+      --debug                              debug mode
+      --exclude string                     exclude regexp (default to none)
+      --git-path string                    path of a git binary (default to git)
+  -h, --help                               help for run
+      --include string                     include regexp (default to all)
+      --kustomize-load-restrictor string   kustomize load restrictor type (default to kustomizaton provider defaults)
+      --kustomize-path string              path of a kustomize binary (default to embedded)
+      --target string                      target commitish (default to the current branch)
 ```
 
 ## Contributing
